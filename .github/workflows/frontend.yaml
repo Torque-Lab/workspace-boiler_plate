@@ -1,0 +1,55 @@
+name: Build and Deploy Frontend
+#this is written as per gitops principles so change if you are not using gitops
+on:
+  push:
+    paths:
+      - .github/workflows/frontend.yaml
+      - "docker/**"
+      - "apps/frontend/**"
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Docker login
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Confirm Docker login
+        run: |
+          echo "Docker login test:"
+          docker info
+
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./docker/Dockerfile.frontend
+          push: true
+          tags: docker_username/frontend:${{ github.sha }}
+
+      - name: Clone gitops repo, update, and push
+        env:
+        
+          PAT: ${{ secrets.GITOPS_TOKEN }}
+        run: |
+          git clone https://github.com/user_name/repo_name.git
+          cd repo_name
+
+          sed -i "/nextjs:/,/^[^ ]/s/^\(\s*tag:\s*\).*/\1${{ github.sha }}/" apps/charts/frontend/values.yaml
+          git config user.name "GitHub Actions Bot"
+          git config user.email "actions@github.com"
+          git diff --quiet || {
+            git add apps/charts/frontend/values.yaml
+            git commit -m "Update frontend image to ${{ github.sha }}"
+            git push https://${PAT}@github.com/user_name/repo.git main  --force
+          }

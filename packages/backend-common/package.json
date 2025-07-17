@@ -1,0 +1,25 @@
+{
+  "name": "@repo/backend-common",
+  "version": "1.0.0",
+  "main": "dist/src/index.js",       
+  "module": "dist/src/index.js",     
+  "exports": {
+    ".": {
+      "require": "./dist/src/index.js",
+      "import": "./dist/src/index.js",
+      "types": "./dist/src/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"  
+  ],
+  "scripts": {
+    "build:prod": "echo CURRENT DIR: $(pwd) && tsc -p tsconfig.build.json "
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:*"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}

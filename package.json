@@ -1,0 +1,26 @@
+{
+  "name": "workspace_boiler_plate",
+  "private": true,
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "build:http-backend": "turbo run build:prod --filter=@repo/http-backend",
+    "build:frontend": "turbo run build:prod --filter=@repo/frontend",
+    "bridge:symlink-http-backend":"pnpm install --prod --filter @repo/http-backend",
+    "start:frontend": "cd apps/frontend &&  node server.js",
+    "start:http-backend": "cd apps/http-backend/dist/src && node index.js",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "check-types": "turbo run check-types"
+  },
+  "devDependencies": {
+    "prettier": "^3.5.3",
+    "turbo": "^2.5.4",
+    "typescript": "5.8.2",
+    "w": "^2.3.1"
+  },
+  "packageManager": "pnpm@9.0.0",
+  "engines": {
+    "node": ">=18"
+  }
+}
